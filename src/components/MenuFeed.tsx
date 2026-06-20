@@ -9,8 +9,8 @@ import { useCart } from "@/lib/cart";
 import LanguageSelector from "@/components/LanguageSelector";
 import FoodCard from "@/components/FoodCard";
 import FoodSpinner from "@/components/FoodSpinner";
-import CartDrawer from "@/components/CartDrawer";
 import FoodDetailModal from "@/components/FoodDetailModal";
+import WifiDetailModal from "@/components/WifiDetailModal";
 
 interface MenuData {
   restaurantId: string;
@@ -19,6 +19,10 @@ interface MenuData {
   tableNumber: string;
   whatsappNumber: string;
   menu: MenuItem[];
+  wifiDetails?: {
+    ssid: string;
+    password?: string;
+  };
 }
 
 interface MenuFeedProps {
@@ -34,8 +38,8 @@ export default function MenuFeed({ data }: MenuFeedProps) {
   const [isChefRecommendedOnly, setIsChefRecommendedOnly] = useState<boolean>(false);
   
   const [isSpinnerOpen, setIsSpinnerOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedDetailItem, setSelectedDetailItem] = useState<MenuItem | null>(null);
+  const [isWifiModalOpen, setIsWifiModalOpen] = useState(false);
 
   const { language, t } = useTranslation();
   const { cart, totalItems, totalPrice, updateQuantity, clearCart } = useCart();
@@ -111,12 +115,17 @@ export default function MenuFeed({ data }: MenuFeedProps) {
         <div className="lg:col-span-2 bg-white rounded-3xl overflow-hidden border border-stone-200/50 shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex flex-col pb-12">
           
           {/* Top Banner (Cafe Harbor Style Hero Header) */}
-          <div 
-            className="relative w-full h-56 md:h-64 bg-cover bg-center flex flex-col justify-end p-5 text-white"
-            style={{
-              backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1498804103079-a6351b050096?auto=format&fit=crop&w=800&q=80')`
-            }}
-          >
+          <div className="relative w-full h-56 md:h-64 flex flex-col justify-end p-5 text-white overflow-hidden">
+            {/* Banner Background Image Layer (Preload & High Priority) */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="https://images.unsplash.com/photo-1498804103079-a6351b050096?auto=format&fit=crop&w=800&q=80"
+              alt="Restaurant Banner"
+              className="absolute inset-0 w-full h-full object-cover"
+              fetchPriority="high"
+            />
+            {/* Overlay Gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-stone-950/10 to-transparent" />
             {/* Back navigation & Language Selector */}
             <div className="absolute top-4 inset-x-4 flex items-center justify-between z-10">
               <Link
@@ -138,9 +147,18 @@ export default function MenuFeed({ data }: MenuFeedProps) {
                 <button className="flex items-center gap-1.5 px-3 py-1 text-[11px] font-black border border-white rounded-full bg-white/10 hover:bg-white/20 transition-all cursor-pointer">
                   <span>📍</span> {t("directions")}
                 </button>
-                <button className="flex items-center gap-1.5 px-3 py-1 text-[11px] font-black border border-white rounded-full bg-white/10 hover:bg-white/20 transition-all cursor-pointer">
-                  <span>📶</span> {t("wifi")}
-                </button>
+                {data.wifiDetails && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      setIsWifiModalOpen(true);
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1 text-[11px] font-black border border-white rounded-full bg-white/10 hover:bg-white/20 transition-all cursor-pointer"
+                  >
+                    <span>📶</span> {t("wifi")}
+                  </button>
+                )}
               </div>
 
               {/* Carousel dots indicators */}
@@ -277,10 +295,11 @@ export default function MenuFeed({ data }: MenuFeedProps) {
           {/* Responsive Food Card Grid */}
           <div className="px-5 grid grid-cols-1 md:grid-cols-2 gap-4 mt-1">
             {filteredMenu.length > 0 ? (
-              filteredMenu.map((item) => (
+              filteredMenu.map((item, idx) => (
                 <FoodCard
                   key={item.id}
                   item={item}
+                  index={idx}
                   onCardClick={(selectedItem) => setSelectedDetailItem(selectedItem)}
                 />
               ))
@@ -412,11 +431,7 @@ export default function MenuFeed({ data }: MenuFeedProps) {
         onClose={() => setIsSpinnerOpen(false)}
       />
 
-      {/* Slide up checkout Drawer details (Mobile Only) */}
-      <CartDrawer
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-      />
+
 
       {/* Food Detail Modal */}
       <FoodDetailModal
@@ -426,6 +441,17 @@ export default function MenuFeed({ data }: MenuFeedProps) {
         menu={data.menu}
         onSelectAnotherItem={(item) => setSelectedDetailItem(item)}
       />
+
+      {/* WiFi Information Modal */}
+      {data.wifiDetails && (
+        <WifiDetailModal
+          isOpen={isWifiModalOpen}
+          onClose={() => setIsWifiModalOpen(false)}
+          ssid={data.wifiDetails.ssid}
+          password={data.wifiDetails.password}
+          restaurantName={restaurantName}
+        />
+      )}
 
       {/* Pinned Bottom Navigation / Checkout Bar (Mobile/Tablet Only, lg:hidden) */}
       <div className="lg:hidden fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur-xl border-t border-stone-200/50 p-4 pb-6 flex items-center justify-between gap-3.5 shadow-[0_-10px_35px_rgba(0,0,0,0.06)] z-40 max-w-2xl mx-auto rounded-t-3xl">
@@ -440,7 +466,7 @@ export default function MenuFeed({ data }: MenuFeedProps) {
 
         {/* Place order via Whatsapp */}
         <button
-          onClick={() => setIsCartOpen(true)}
+          onClick={handlePlaceOrder}
           disabled={cart.length === 0}
           className="flex-1 flex items-center justify-center gap-2 py-4 bg-gradient-to-r from-orange-500 via-red-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white text-xs font-black rounded-2xl uppercase tracking-wider cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed transition-all active:scale-98 shadow-[0_6px_20px_rgba(234,88,12,0.22)] disabled:shadow-none relative overflow-hidden"
         >

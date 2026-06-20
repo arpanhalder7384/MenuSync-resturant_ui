@@ -14,12 +14,18 @@ export interface MenuItem {
   pairingReasonBn?: string;
 }
 
+export interface WifiDetails {
+  ssid: string;
+  password?: string;
+}
+
 export interface Restaurant {
   id: string;
   nameEn: string;
   nameBn: string;
   whatsappNumber: string;
   menu: MenuItem[];
+  wifiDetails?: WifiDetails;
 }
 
 export interface QRMapping {
@@ -242,7 +248,11 @@ export const MOCK_RESTAURANTS: Record<string, Restaurant> = {
         isSpecial: true,
         isVeg: true,
       }
-    ]
+    ],
+    wifiDetails: {
+      ssid: "SpiceGarden_Guest",
+      password: "curry123"
+    }
   },
   REST003: {
     id: "REST003",
@@ -274,7 +284,11 @@ export const MOCK_RESTAURANTS: Record<string, Restaurant> = {
         isSpecial: true,
         isVeg: true,
       }
-    ]
+    ],
+    wifiDetails: {
+      ssid: "CafeHarbour_5G",
+      password: "harbour@2026"
+    }
   }
 };
 

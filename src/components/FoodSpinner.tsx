@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { MenuItem } from "@/lib/mockData";
 import { useTranslation } from "@/lib/translations";
 import { useCart } from "@/lib/cart";
@@ -26,49 +26,16 @@ export default function FoodSpinner({ items, isOpen, onClose }: FoodSpinnerProps
   const [mainItem, setMainItem] = useState<MenuItem | null>(null);
   const [dessertItem, setDessertItem] = useState<MenuItem | null>(null);
 
+  // Lock States
+  const [starterLocked, setStarterLocked] = useState(false);
+  const [mainLocked, setMainLocked] = useState(false);
+  const [dessertLocked, setDessertLocked] = useState(false);
+
   // Animation States
   const [isSpinningStarter, setIsSpinningStarter] = useState(false);
   const [isSpinningMain, setIsSpinningMain] = useState(false);
   const [isSpinningDessert, setIsSpinningDessert] = useState(false);
   const [hasSpun, setHasSpun] = useState(false);
-
-  // Active cycling index during spin
-  const [cycleAppetizerIdx, setCycleAppetizerIdx] = useState(0);
-  const [cycleEntreeIdx, setCycleEntreeIdx] = useState(0);
-  const [cycleDessertIdx, setCycleDessertIdx] = useState(0);
-
-  // Cycle Appetizers
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isSpinningStarter && appetizers.length > 0) {
-      timer = setInterval(() => {
-        setCycleAppetizerIdx((prev) => (prev + 1) % appetizers.length);
-      }, 90);
-    }
-    return () => clearInterval(timer);
-  }, [isSpinningStarter, appetizers.length]);
-
-  // Cycle Entrées
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isSpinningMain && entrees.length > 0) {
-      timer = setInterval(() => {
-        setCycleEntreeIdx((prev) => (prev + 1) % entrees.length);
-      }, 90);
-    }
-    return () => clearInterval(timer);
-  }, [isSpinningMain, entrees.length]);
-
-  // Cycle Desserts
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isSpinningDessert && desserts.length > 0) {
-      timer = setInterval(() => {
-        setCycleDessertIdx((prev) => (prev + 1) % desserts.length);
-      }, 90);
-    }
-    return () => clearInterval(timer);
-  }, [isSpinningDessert, desserts.length]);
 
   if (!isOpen) return null;
 
@@ -78,65 +45,64 @@ export default function FoodSpinner({ items, isOpen, onClose }: FoodSpinnerProps
     if (isSpinning) return;
 
     setHasSpun(true);
-    setStarterItem(null);
-    setMainItem(null);
-    setDessertItem(null);
 
-    // Start all spinning
-    setIsSpinningStarter(true);
-    setIsSpinningMain(true);
-    setIsSpinningDessert(true);
+    // Start Appetizer spinning if not locked
+    if (!starterLocked) {
+      setStarterItem(null);
+      setIsSpinningStarter(true);
+      setTimeout(() => {
+        setIsSpinningStarter(false);
+        if (appetizers.length > 0) {
+          setStarterItem(appetizers[Math.floor(Math.random() * appetizers.length)]);
+        }
+      }, 1200);
+    }
 
-    // Stop Starter (Appetizer)
-    setTimeout(() => {
-      setIsSpinningStarter(false);
-      if (appetizers.length > 0) {
-        setStarterItem(appetizers[Math.floor(Math.random() * appetizers.length)]);
-      }
-    }, 1200);
+    // Start Main spinning if not locked
+    if (!mainLocked) {
+      setMainItem(null);
+      setIsSpinningMain(true);
+      setTimeout(() => {
+        setIsSpinningMain(false);
+        if (entrees.length > 0) {
+          setMainItem(entrees[Math.floor(Math.random() * entrees.length)]);
+        }
+      }, 2000);
+    }
 
-    // Stop Main (Entrée)
-    setTimeout(() => {
-      setIsSpinningMain(false);
-      if (entrees.length > 0) {
-        setMainItem(entrees[Math.floor(Math.random() * entrees.length)]);
-      }
-    }, 2000);
-
-    // Stop Dessert
-    setTimeout(() => {
-      setIsSpinningDessert(false);
-      if (desserts.length > 0) {
-        setDessertItem(desserts[Math.floor(Math.random() * desserts.length)]);
-      }
-    }, 2800);
+    // Start Dessert spinning if not locked
+    if (!dessertLocked) {
+      setDessertItem(null);
+      setIsSpinningDessert(true);
+      setTimeout(() => {
+        setIsSpinningDessert(false);
+        if (desserts.length > 0) {
+          setDessertItem(desserts[Math.floor(Math.random() * desserts.length)]);
+        }
+      }, 2800);
+    }
   };
 
   const handleAddComboToCart = () => {
     if (starterItem) addToCart(starterItem);
     if (mainItem) addToCart(mainItem);
     if (dessertItem) addToCart(dessertItem);
+    setStarterLocked(false);
+    setMainLocked(false);
+    setDessertLocked(false);
     onClose();
   };
 
-  // Current values shown in slots (either final winner or cycled temporary item)
-  const currentAppetizer = isSpinningStarter
-    ? appetizers[cycleAppetizerIdx]
-    : starterItem;
-
-  const currentEntree = isSpinningMain
-    ? entrees[cycleEntreeIdx]
-    : mainItem;
-
-  const currentDessert = isSpinningDessert
-    ? desserts[cycleDessertIdx]
-    : dessertItem;
+  const currentAppetizer = starterItem;
+  const currentEntree = mainItem;
+  const currentDessert = dessertItem;
 
   // Calculate total price of combo
   const comboTotal =
     (starterItem?.price || 0) + (mainItem?.price || 0) + (dessertItem?.price || 0);
 
-  return (
+  // Check if all active slots are locked
+  const allLocked = starterLocked && mainLocked && dessertLocked;  return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-950/80 backdrop-blur-md transition-opacity duration-300">
       <div
         className="relative w-full max-w-lg bg-stone-900 border border-stone-800 rounded-3xl p-6 md:p-8 shadow-2xl flex flex-col items-center overflow-hidden transition-all duration-300"
@@ -146,7 +112,7 @@ export default function FoodSpinner({ items, isOpen, onClose }: FoodSpinnerProps
         <button
           onClick={onClose}
           disabled={isSpinning}
-          className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full bg-stone-800 hover:bg-stone-700 text-stone-400 hover:text-stone-200 transition-colors cursor-pointer disabled:opacity-50"
+          className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full bg-stone-800 hover:bg-stone-700 text-stone-400 hover:text-stone-200 transition-colors cursor-pointer disabled:opacity-50 z-20"
         >
           ✕
         </button>
@@ -159,6 +125,18 @@ export default function FoodSpinner({ items, isOpen, onClose }: FoodSpinnerProps
           {t("spin_fav")}
         </p>
 
+        {/* CSS Keyframes for Slot Machine Roll */}
+        <style>{`
+          @keyframes slotRoll {
+            0% {
+              transform: translateY(0);
+            }
+            100% {
+              transform: translateY(-50%);
+            }
+          }
+        `}</style>
+
         {/* 3 slots in a row */}
         <div className="grid grid-cols-3 gap-3 md:gap-4 w-full mb-8">
           
@@ -167,15 +145,45 @@ export default function FoodSpinner({ items, isOpen, onClose }: FoodSpinnerProps
             <span className="text-[10px] font-black text-stone-500 uppercase tracking-widest text-center">
               {t("appetizer")}
             </span>
-            <div className="relative w-full aspect-5/6 rounded-2xl bg-stone-950 border border-stone-800 flex flex-col justify-between p-3 overflow-hidden shadow-inner group">
-              {/* Lock Indicator */}
-              <div className="absolute top-2 right-2 w-7 h-7 bg-stone-900/80 rounded-full flex items-center justify-center text-xs border border-stone-800 text-stone-400 shadow-sm z-10">
-                {!starterItem && !isSpinningStarter ? "🔒" : "🔓"}
-              </div>
+            <div className="relative w-full aspect-[5/6] rounded-2xl bg-stone-950 border border-stone-800 flex flex-col justify-between p-3 overflow-hidden shadow-inner group">
+              {/* Lock Indicator Button */}
+              {starterItem && !isSpinningStarter && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setStarterLocked(!starterLocked);
+                  }}
+                  className={`absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center text-xs border transition-all z-10 cursor-pointer ${
+                    starterLocked
+                      ? "bg-amber-500 border-amber-400 text-stone-950 scale-105 shadow-sm shadow-amber-500/30 font-bold"
+                      : "bg-stone-900/80 border-stone-800 text-stone-400 hover:text-white"
+                  }`}
+                >
+                  {starterLocked ? "🔒" : "🔓"}
+                </button>
+              )}
 
               {/* Card visual */}
-              {currentAppetizer ? (
-                <>
+              {isSpinningStarter ? (
+                <div className="absolute inset-0 flex flex-col animate-[slotRoll_0.4s_linear_infinite]">
+                  {[...appetizers, ...appetizers].map((item, idx) => (
+                    <div key={`${item.id}-${idx}`} className="w-full h-full flex-shrink-0 flex flex-col p-3 items-center justify-between">
+                      <div className="w-full h-2/3 rounded-xl overflow-hidden mb-1 relative">
+                        <img
+                          src={item.image}
+                          alt={item.nameEn}
+                          className="w-full h-full object-cover bg-stone-800"
+                        />
+                      </div>
+                      <span className="text-[10px] font-extrabold text-stone-300 text-center line-clamp-1 truncate w-full">
+                        {language === "en" ? item.nameEn : item.nameBn}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : currentAppetizer ? (
+                <div className="w-full h-full flex flex-col justify-between">
                   <div className="w-full h-2/3 rounded-xl overflow-hidden mb-1 relative">
                     <img
                       src={currentAppetizer.image}
@@ -186,7 +194,7 @@ export default function FoodSpinner({ items, isOpen, onClose }: FoodSpinnerProps
                   <span className="text-[10px] font-extrabold text-stone-200 text-center line-clamp-2 leading-tight">
                     {language === "en" ? currentAppetizer.nameEn : currentAppetizer.nameBn}
                   </span>
-                </>
+                </div>
               ) : (
                 <div className="flex-1 flex flex-col items-center justify-center gap-2">
                   <span className="text-2xl opacity-30 select-none">🍕</span>
@@ -203,15 +211,45 @@ export default function FoodSpinner({ items, isOpen, onClose }: FoodSpinnerProps
             <span className="text-[10px] font-black text-stone-500 uppercase tracking-widest text-center">
               {t("entree")}
             </span>
-            <div className="relative w-full aspect-5/6 rounded-2xl bg-stone-950 border border-stone-800 flex flex-col justify-between p-3 overflow-hidden shadow-inner group">
-              {/* Lock Indicator */}
-              <div className="absolute top-2 right-2 w-7 h-7 bg-stone-900/80 rounded-full flex items-center justify-center text-xs border border-stone-800 text-stone-400 shadow-sm z-10">
-                {!mainItem && !isSpinningMain ? "🔒" : "🔓"}
-              </div>
+            <div className="relative w-full aspect-[5/6] rounded-2xl bg-stone-950 border border-stone-800 flex flex-col justify-between p-3 overflow-hidden shadow-inner group">
+              {/* Lock Indicator Button */}
+              {mainItem && !isSpinningMain && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMainLocked(!mainLocked);
+                  }}
+                  className={`absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center text-xs border transition-all z-10 cursor-pointer ${
+                    mainLocked
+                      ? "bg-amber-500 border-amber-400 text-stone-955 scale-105 shadow-sm shadow-amber-500/30 font-bold"
+                      : "bg-stone-900/80 border-stone-800 text-stone-400 hover:text-white"
+                  }`}
+                >
+                  {mainLocked ? "🔒" : "🔓"}
+                </button>
+              )}
 
               {/* Card visual */}
-              {currentEntree ? (
-                <>
+              {isSpinningMain ? (
+                <div className="absolute inset-0 flex flex-col animate-[slotRoll_0.4s_linear_infinite]">
+                  {[...entrees, ...entrees].map((item, idx) => (
+                    <div key={`${item.id}-${idx}`} className="w-full h-full flex-shrink-0 flex flex-col p-3 items-center justify-between">
+                      <div className="w-full h-2/3 rounded-xl overflow-hidden mb-1 relative">
+                        <img
+                          src={item.image}
+                          alt={item.nameEn}
+                          className="w-full h-full object-cover bg-stone-800"
+                        />
+                      </div>
+                      <span className="text-[10px] font-extrabold text-stone-300 text-center line-clamp-1 truncate w-full">
+                        {language === "en" ? item.nameEn : item.nameBn}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : currentEntree ? (
+                <div className="w-full h-full flex flex-col justify-between">
                   <div className="w-full h-2/3 rounded-xl overflow-hidden mb-1 relative">
                     <img
                       src={currentEntree.image}
@@ -222,7 +260,7 @@ export default function FoodSpinner({ items, isOpen, onClose }: FoodSpinnerProps
                   <span className="text-[10px] font-extrabold text-stone-200 text-center line-clamp-2 leading-tight">
                     {language === "en" ? currentEntree.nameEn : currentEntree.nameBn}
                   </span>
-                </>
+                </div>
               ) : (
                 <div className="flex-1 flex flex-col items-center justify-center gap-2">
                   <span className="text-2xl opacity-30 select-none">🍜</span>
@@ -239,15 +277,45 @@ export default function FoodSpinner({ items, isOpen, onClose }: FoodSpinnerProps
             <span className="text-[10px] font-black text-stone-500 uppercase tracking-widest text-center">
               {t("dessert_slot")}
             </span>
-            <div className="relative w-full aspect-5/6 rounded-2xl bg-stone-950 border border-stone-800 flex flex-col justify-between p-3 overflow-hidden shadow-inner group">
-              {/* Lock Indicator */}
-              <div className="absolute top-2 right-2 w-7 h-7 bg-stone-900/80 rounded-full flex items-center justify-center text-xs border border-stone-800 text-stone-400 shadow-sm z-10">
-                {!dessertItem && !isSpinningDessert ? "🔒" : "🔓"}
-              </div>
+            <div className="relative w-full aspect-[5/6] rounded-2xl bg-stone-950 border border-stone-800 flex flex-col justify-between p-3 overflow-hidden shadow-inner group">
+              {/* Lock Indicator Button */}
+              {dessertItem && !isSpinningDessert && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDessertLocked(!dessertLocked);
+                  }}
+                  className={`absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center text-xs border transition-all z-10 cursor-pointer ${
+                    dessertLocked
+                      ? "bg-amber-500 border-amber-400 text-stone-955 scale-105 shadow-sm shadow-amber-500/30 font-bold"
+                      : "bg-stone-900/80 border-stone-800 text-stone-400 hover:text-white"
+                  }`}
+                >
+                  {dessertLocked ? "🔒" : "🔓"}
+                </button>
+              )}
 
               {/* Card visual */}
-              {currentDessert ? (
-                <>
+              {isSpinningDessert ? (
+                <div className="absolute inset-0 flex flex-col animate-[slotRoll_0.4s_linear_infinite]">
+                  {[...desserts, ...desserts].map((item, idx) => (
+                    <div key={`${item.id}-${idx}`} className="w-full h-full flex-shrink-0 flex flex-col p-3 items-center justify-between">
+                      <div className="w-full h-2/3 rounded-xl overflow-hidden mb-1 relative">
+                        <img
+                          src={item.image}
+                          alt={item.nameEn}
+                          className="w-full h-full object-cover bg-stone-800"
+                        />
+                      </div>
+                      <span className="text-[10px] font-extrabold text-stone-300 text-center line-clamp-1 truncate w-full">
+                        {language === "en" ? item.nameEn : item.nameBn}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : currentDessert ? (
+                <div className="w-full h-full flex flex-col justify-between">
                   <div className="w-full h-2/3 rounded-xl overflow-hidden mb-1 relative">
                     <img
                       src={currentDessert.image}
@@ -258,7 +326,7 @@ export default function FoodSpinner({ items, isOpen, onClose }: FoodSpinnerProps
                   <span className="text-[10px] font-extrabold text-stone-200 text-center line-clamp-2 leading-tight">
                     {language === "en" ? currentDessert.nameEn : currentDessert.nameBn}
                   </span>
-                </>
+                </div>
               ) : (
                 <div className="flex-1 flex flex-col items-center justify-center gap-2">
                   <span className="text-2xl opacity-30 select-none">🍰</span>
@@ -279,9 +347,10 @@ export default function FoodSpinner({ items, isOpen, onClose }: FoodSpinnerProps
           {!hasSpun && !isSpinning && (
             <button
               onClick={handleSpinSlots}
-              className="w-full max-w-sm py-4 bg-white hover:bg-stone-100 text-stone-950 text-sm font-black rounded-xl shadow-lg transition-all transform active:scale-98 cursor-pointer uppercase tracking-wider text-center"
+              className="w-full max-w-sm py-4 bg-white hover:bg-stone-100 text-stone-955 text-sm font-black rounded-xl shadow-lg transition-all transform active:scale-98 cursor-pointer uppercase tracking-wider text-center flex items-center justify-center gap-2"
             >
-              {t("generate_match")}
+              <span className="text-base">🎲</span>
+              <span>{t("generate_match")}</span>
             </button>
           )}
 
@@ -309,7 +378,7 @@ export default function FoodSpinner({ items, isOpen, onClose }: FoodSpinnerProps
               {/* Add Combo to Cart */}
               <button
                 onClick={handleAddComboToCart}
-                className="w-full max-w-sm py-4 bg-white hover:bg-stone-100 text-stone-950 text-sm font-black rounded-xl shadow-lg transition-all transform active:scale-98 cursor-pointer uppercase tracking-wider text-center"
+                className="w-full max-w-sm py-4 bg-white hover:bg-stone-100 text-stone-955 text-sm font-black rounded-xl shadow-lg transition-all transform active:scale-98 cursor-pointer uppercase tracking-wider text-center"
               >
                 📥 {t("add_combo")} ({t("currency")}{comboTotal})
               </button>
@@ -317,7 +386,8 @@ export default function FoodSpinner({ items, isOpen, onClose }: FoodSpinnerProps
               {/* Spin Again */}
               <button
                 onClick={handleSpinSlots}
-                className="text-xs font-black text-stone-400 hover:text-white transition-colors cursor-pointer underline tracking-wider uppercase"
+                disabled={allLocked}
+                className="text-xs font-black text-stone-400 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer underline tracking-wider uppercase"
               >
                 🔄 {t("spin_again")}
               </button>

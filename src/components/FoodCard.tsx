@@ -9,9 +9,10 @@ import { useCart } from "@/lib/cart";
 interface FoodCardProps {
   item: MenuItem;
   onCardClick?: (item: MenuItem) => void;
+  index: number;
 }
 
-export default function FoodCard({ item, onCardClick }: FoodCardProps) {
+export default function FoodCard({ item, onCardClick, index }: FoodCardProps) {
   const { language, t } = useTranslation();
   const { cart, addToCart, updateQuantity } = useCart();
 
@@ -74,7 +75,8 @@ export default function FoodCard({ item, onCardClick }: FoodCardProps) {
           src={item.image}
           alt={name}
           className="w-full h-full object-cover rounded-xl bg-stone-100 border border-stone-100"
-          loading="lazy"
+          loading={index < 2 ? "eager" : "lazy"}
+          {...(index === 0 ? { fetchPriority: "high" } : {})}
         />
 
         {/* Floating Add / Quantity Adjuster */}

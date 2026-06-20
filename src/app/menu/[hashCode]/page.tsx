@@ -85,6 +85,7 @@ export default async function MenuPage({
     tableNumber: mapping.tableNumber,
     whatsappNumber: restaurant.whatsappNumber,
     menu: restaurant.menu,
+    wifiDetails: restaurant.wifiDetails,
   };
 
   return <MenuFeed data={data} />;

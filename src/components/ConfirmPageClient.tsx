@@ -11,7 +11,7 @@ import BrandLogo from "@/components/BrandLogo";
 
 export default function ConfirmPageClient() {
   const params = useParams();
-  const { cart, totalPrice, clearCart } = useCart();
+  const { cart, totalPrice, clearCart, updateQuantity } = useCart();
   const { language, t } = useTranslation();
 
   const [customerName, setCustomerName] = useState("");
@@ -276,10 +276,10 @@ ${nameSection}Table ${mapping.tableNumber}`;
                   {cart.map(({ item, quantity }, index) => {
                     const itemName = language === "en" ? item.nameEn : item.nameBn;
                     return (
-                      <div key={item.id} className={`flex items-start justify-between gap-4 ${index > 0 ? "pt-3.5" : ""}`}>
-                        <div className="flex gap-2 min-w-0">
+                      <div key={item.id} className={`flex items-center justify-between gap-4 ${index > 0 ? "pt-3.5" : ""}`}>
+                        <div className="flex items-center gap-2 min-w-0">
                           <span
-                            className={`flex-shrink-0 w-2.5 h-2.5 border rounded p-[1.5px] mt-1 ${
+                            className={`flex-shrink-0 w-2.5 h-2.5 border rounded p-[1.5px] ${
                               item.isVeg ? "border-green-600" : "border-red-600"
                             }`}
                           >
@@ -290,17 +290,37 @@ ${nameSection}Table ${mapping.tableNumber}`;
                             />
                           </span>
                           <div className="truncate">
-                            <h4 className="text-xs font-black text-stone-800 leading-tight">
+                            <h4 className="text-xs font-black text-stone-850 leading-tight truncate max-w-[120px] sm:max-w-xs">
                               {itemName}
                             </h4>
                             <span className="text-[10px] text-stone-400 font-bold">
-                              x{quantity} • {t("currency")}{item.price}
+                              {t("currency")}{item.price}
                             </span>
                           </div>
                         </div>
-                        <span className="text-xs font-black text-stone-900 flex-shrink-0">
-                          {t("currency")}{item.price * quantity}
-                        </span>
+                        
+                        <div className="flex items-center gap-3.5 flex-shrink-0">
+                          <div className="flex items-center bg-stone-100 rounded-lg overflow-hidden border border-stone-200/50">
+                            <button
+                              onClick={() => updateQuantity(item.id, quantity - 1)}
+                              className={`px-2 py-0.5 text-xs font-black ${theme.text} hover:bg-stone-200/60 transition-colors cursor-pointer`}
+                            >
+                              −
+                            </button>
+                            <span className="px-1 text-[11px] font-black text-stone-900">
+                              {quantity}
+                            </span>
+                            <button
+                              onClick={() => updateQuantity(item.id, quantity + 1)}
+                              className={`px-2 py-0.5 text-xs font-black ${theme.text} hover:bg-stone-200/60 transition-colors cursor-pointer`}
+                            >
+                              +
+                            </button>
+                          </div>
+                          <span className="w-12 text-right text-xs font-black text-stone-900">
+                            {t("currency")}{item.price * quantity}
+                          </span>
+                        </div>
                       </div>
                     );
                   })}

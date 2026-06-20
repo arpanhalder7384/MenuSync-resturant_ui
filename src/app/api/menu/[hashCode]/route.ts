@@ -33,6 +33,7 @@ export async function GET(
       tableNumber: mapping.tableNumber,
       whatsappNumber: restaurant.whatsappNumber,
       menu: restaurant.menu,
+      wifiDetails: restaurant.wifiDetails,
     });
   } catch (error) {
     console.error("API Error in fetching menu:", error);
