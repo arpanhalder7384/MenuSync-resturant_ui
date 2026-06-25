@@ -22,7 +22,7 @@ export default function PhoneMockup() {
               {language === "en" ? "Welcome to" : "স্বাগতম"}
             </span>
             <span className="text-[10px] font-black text-stone-900">
-              Mio Amore Cafe
+              {language === "en" ? "Cafe Adda" : "ক্যাফে আড্ডা"}
             </span>
           </div>
           <span className="text-[8px] font-black bg-stone-900 text-white px-2 py-0.5 rounded">

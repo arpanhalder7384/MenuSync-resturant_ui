@@ -59,7 +59,7 @@ export const translations = {
     step_3_desc: "Checkout directly. An automated, itemized order reaches the restaurant's WhatsApp.",
     copyright: "© 2026 PlateProject. All rights reserved.",
     back_to_menu: "Back to Menu",
-    currency: "₹",
+    currency: "₹ ",
     // Cafe Harbour styling translations
     dont_know_title: "Don't know what to eat?",
     spin_fav: "Spin to discover your next favorite ✨",
@@ -167,7 +167,7 @@ export const translations = {
     step_3_desc: "Checkout directly. An automated, itemized order reaches the restaurant's WhatsApp.",
     copyright: "© ২০২৬ প্লেটপ্রজেক্ট। সর্বস্বত্ব সংরক্ষিত।",
     back_to_menu: "মেনুতে ফিরে যান",
-    currency: "টাকা ",
+    currency: "₹ ",
     // Cafe Harbour styling translations in Bengali
     dont_know_title: "কী খাবেন বুঝতে পারছেন না?",
     spin_fav: "আপনার পরবর্তী প্রিয় খাবারটি খুঁজতে স্পিন করুন ✨",

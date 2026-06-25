@@ -27,7 +27,7 @@ export default function SimulatedTables() {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-4xl mx-auto">
         
-        {/* Mio Amore Cafe Table 01 */}
+        {/* Cafe Adda Table 01 */}
         <Link
           href="/menu/mdbhjsadjasdgjafcvcsj3213h2veg24gh234h"
           className="relative flex flex-col justify-between p-6 bg-gradient-to-br from-white to-stone-50/10 border border-stone-200/60 border-t-4 border-t-orange-500 rounded-3xl shadow-[0_4px_25px_rgba(0,0,0,0.015)] hover:shadow-[0_15px_35px_rgba(234,88,12,0.1)] hover:border-orange-500/30 transition-all transform hover:-translate-y-1.5 group overflow-hidden"
@@ -40,7 +40,7 @@ export default function SimulatedTables() {
           <div className="pr-8">
             <div className="flex items-center gap-2 mb-4">
               <span className="px-2 py-0.5 text-[8.5px] font-black uppercase tracking-wider bg-orange-50 border border-orange-200/50 text-orange-700 rounded-md">
-                {language === "en" ? "MIO AMORE" : "মিও আমোরে"}
+                {language === "en" ? "CAFE ADDA" : "ক্যাফে আড্ডা"}
               </span>
               <span className="flex h-2 w-2 relative">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -49,7 +49,7 @@ export default function SimulatedTables() {
             </div>
             
             <h3 className="text-base font-black text-stone-900 group-hover:text-orange-600 transition-colors tracking-tight">
-              {language === "en" ? "Mio Amore Cafe" : "মিও আমোরে ক্যাফে"}
+              {language === "en" ? "Cafe Adda" : "ক্যাফে আড্ডা"}
             </h3>
             
             <p className="text-xs text-stone-450 mt-2 leading-relaxed font-extrabold">

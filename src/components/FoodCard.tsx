@@ -59,9 +59,11 @@ export default function FoodCard({ item, onCardClick, index }: FoodCardProps) {
             {name}
           </h3>
 
-          <p className="text-stone-900 font-black text-xs mt-0.5">
-            {t("currency")}{item.price}
-          </p>
+          <div className="mt-1">
+            <span className="inline-flex items-center text-xs font-bold text-orange-655 bg-orange-50/60 px-2 py-0.5 rounded-lg border border-orange-100/50">
+              {t("currency")}{item.price}
+            </span>
+          </div>
 
           <p className="text-[11px] text-stone-500 mt-2 line-clamp-2 leading-relaxed">
             {description}

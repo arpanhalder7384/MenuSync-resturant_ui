@@ -484,32 +484,34 @@ export default function MenuFeed({ data }: MenuFeedProps) {
         />
       )}
 
-      {/* Pinned Bottom Navigation / Checkout Bar (Mobile/Tablet Only, lg:hidden) */}
-      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur-xl border-t border-stone-200/50 p-4 pb-6 flex items-center justify-between gap-3.5 shadow-[0_-10px_35px_rgba(0,0,0,0.06)] z-40 max-w-2xl mx-auto rounded-t-3xl">
-        {/* Surprise me (spinner) */}
-        <button
-          onClick={() => setIsSpinnerOpen(true)}
-          className="flex items-center justify-center gap-1.5 px-4 py-4 bg-orange-50/60 border border-orange-200 hover:bg-orange-50 text-orange-600 text-xs font-black rounded-2xl uppercase tracking-wider cursor-pointer transition-all active:scale-95 shadow-[0_4px_12px_rgba(234,88,12,0.05)]"
-        >
-          <span className="text-sm">🎲</span>
-          <span>{t("surprise_me")}</span>
-        </button>
+      {/* Floating Magic Spin Action Button (Mobile/Tablet Only, lg:hidden) */}
+      <button
+        onClick={() => setIsSpinnerOpen(true)}
+        className={`lg:hidden fixed right-6 z-45 w-14 h-14 bg-[#023c31] text-white rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer border border-[#012d25] ${
+          cart.length > 0 ? "bottom-28" : "bottom-6"
+        }`}
+      >
+        <span className="text-2xl">🎲</span>
+      </button>
 
-        {/* Place order via Whatsapp */}
-        <button
-          onClick={handlePlaceOrder}
-          disabled={cart.length === 0}
-          className="flex-1 flex items-center justify-center gap-2 py-4 bg-gradient-to-r from-orange-500 via-red-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white text-xs font-black rounded-2xl uppercase tracking-wider cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed transition-all active:scale-98 shadow-[0_6px_20px_rgba(234,88,12,0.22)] disabled:shadow-none relative overflow-hidden"
-        >
-          <span className="text-sm">👜</span>
-          <span className="flex items-center gap-2">
-            <span>{t("place_order_bag")}</span>
-            <span className="inline-flex items-center justify-center bg-white text-orange-600 text-[10.5px] font-black w-5 h-5 rounded-full shadow-sm">
-              {totalItems}
+      {/* Pinned Bottom Navigation / Checkout Bar (Mobile/Tablet Only, lg:hidden) */}
+      {cart.length > 0 && (
+        <div className="lg:hidden fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur-xl border-t border-stone-200/50 p-4 pb-6 flex items-center justify-between gap-3.5 shadow-[0_-10px_35px_rgba(0,0,0,0.06)] z-40 max-w-2xl mx-auto rounded-t-3xl">
+          {/* Place order via Whatsapp */}
+          <button
+            onClick={handlePlaceOrder}
+            className="flex-1 flex items-center justify-center gap-2 py-4 bg-gradient-to-r from-orange-500 via-red-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white text-xs font-black rounded-2xl uppercase tracking-wider cursor-pointer transition-all active:scale-98 shadow-[0_6px_20px_rgba(234,88,12,0.22)] relative overflow-hidden"
+          >
+            <span className="text-sm">👜</span>
+            <span className="flex items-center gap-2">
+              <span>{t("place_order_bag")}</span>
+              <span className="inline-flex items-center justify-center bg-white text-orange-600 text-[10.5px] font-black w-5 h-5 rounded-full shadow-sm">
+                {totalItems}
+              </span>
             </span>
-          </span>
-        </button>
-      </div>
+          </button>
+        </div>
+      )}
 
     </div>
   );
