@@ -1,16 +1,20 @@
 import React from "react";
 import { Metadata } from "next";
-import { HASH_MAPPINGS, MOCK_RESTAURANTS } from "@/lib/mockData";
+import { getQRMapping, getRestaurant } from "@/lib/dataService";
 import ConfirmPageClient from "@/components/ConfirmPageClient";
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ hashCode: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }): Promise<Metadata> {
   const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
   const hashCode = resolvedParams.hashCode;
-  const mapping = HASH_MAPPINGS[hashCode];
+  const tableCode = typeof resolvedSearchParams?.table === "string" ? resolvedSearchParams.table : "";
+  const mapping = getQRMapping(hashCode, tableCode);
   
   if (!mapping) {
     return {
@@ -18,7 +22,7 @@ export async function generateMetadata({
     };
   }
 
-  const restaurant = MOCK_RESTAURANTS[mapping.restaurantId];
+  const restaurant = getRestaurant(mapping.restaurantId);
   if (!restaurant) {
     return {
       title: "Confirm Order | PlateProject",

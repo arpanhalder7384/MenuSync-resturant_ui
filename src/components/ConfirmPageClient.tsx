@@ -2,15 +2,16 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useCart } from "@/lib/cart";
 import { useTranslation } from "@/lib/translations";
-import { HASH_MAPPINGS, MOCK_RESTAURANTS } from "@/lib/mockData";
+import { getQRMapping, getRestaurant } from "@/lib/dataService";
 import LanguageSelector from "@/components/LanguageSelector";
 import BrandLogo from "@/components/BrandLogo";
 
 export default function ConfirmPageClient() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const { cart, totalPrice, clearCart, updateQuantity } = useCart();
   const { language, t } = useTranslation();
 
@@ -18,7 +19,9 @@ export default function ConfirmPageClient() {
   const [isOrdered, setIsOrdered] = useState(false);
 
   const hashCode = typeof params?.hashCode === "string" ? params.hashCode : "";
-  const mapping = HASH_MAPPINGS[hashCode];
+  const tableCode = searchParams.get("table") || "";
+  const mapping = getQRMapping(hashCode, tableCode);
+  const tableQuery = tableCode ? `?table=${tableCode}` : "";
 
   if (!mapping) {
     return (
@@ -39,7 +42,7 @@ export default function ConfirmPageClient() {
     );
   }
 
-  const restaurant = MOCK_RESTAURANTS[mapping.restaurantId];
+  const restaurant = getRestaurant(mapping.restaurantId);
 
   if (!restaurant) {
     return (
@@ -193,7 +196,7 @@ ${nameSection}Table ${mapping.tableNumber}`;
             </div>
             
             <Link
-              href={`/menu/${hashCode}`}
+              href={`/menu/${hashCode}${tableQuery}`}
               className={`w-full py-3.5 bg-gradient-to-r ${theme.gradient} text-white text-xs font-black rounded-xl uppercase tracking-wider text-center transition-all ${theme.glow}`}
             >
               {t("back_to_menu")}
@@ -227,7 +230,7 @@ ${nameSection}Table ${mapping.tableNumber}`;
         {/* Back Link */}
         <div className="flex items-center justify-between">
           <Link
-            href={`/menu/${hashCode}`}
+            href={`/menu/${hashCode}${tableQuery}`}
             className="inline-flex items-center gap-1 text-xs font-black text-stone-500 hover:text-stone-800 transition-colors uppercase tracking-wider cursor-pointer"
           >
             <span>←</span>
@@ -247,7 +250,7 @@ ${nameSection}Table ${mapping.tableNumber}`;
               {t("empty_confirm_cart")}
             </p>
             <Link
-              href={`/menu/${hashCode}`}
+              href={`/menu/${hashCode}${tableQuery}`}
               className={`px-6 py-2.5 bg-gradient-to-r ${theme.gradient} text-white text-xs font-black rounded-full uppercase tracking-wider shadow-sm transition-all`}
             >
               {t("back_to_menu")}

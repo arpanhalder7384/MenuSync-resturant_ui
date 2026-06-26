@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { MenuItem } from "@/lib/mockData";
 import { useTranslation } from "@/lib/translations";
 import { useCart } from "@/lib/cart";
@@ -45,7 +45,9 @@ export default function MenuFeed({ data }: MenuFeedProps) {
   const { cart, totalItems, totalPrice, updateQuantity, clearCart } = useCart();
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const hashCode = typeof params?.hashCode === "string" ? params.hashCode : "";
+  const tableCode = searchParams.get("table") || "";
 
   // Helper to convert table numbers to Bengali digits
   const formatTableNumber = (table: string) => {
@@ -102,7 +104,8 @@ export default function MenuFeed({ data }: MenuFeedProps) {
   };
 
   const handlePlaceOrder = () => {
-    router.push(`/menu/${hashCode}/confirm`);
+    const tableQuery = tableCode ? `?table=${tableCode}` : "";
+    router.push(`/menu/${hashCode}/confirm${tableQuery}`);
   };
 
   return (

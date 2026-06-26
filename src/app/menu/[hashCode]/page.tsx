@@ -1,17 +1,21 @@
 import React from "react";
-import Link from "next/link";
 import { Metadata } from "next";
-import { HASH_MAPPINGS, MOCK_RESTAURANTS } from "@/lib/mockData";
+import { getQRMapping, getRestaurant } from "@/lib/dataService";
 import MenuFeed from "@/components/MenuFeed";
+import InvalidQRFallback from "@/components/InvalidQRFallback";
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ hashCode: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }): Promise<Metadata> {
   const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
   const hashCode = resolvedParams.hashCode;
-  const mapping = HASH_MAPPINGS[hashCode];
+  const tableCode = typeof resolvedSearchParams?.table === "string" ? resolvedSearchParams.table : "";
+  const mapping = getQRMapping(hashCode, tableCode);
   
   if (!mapping) {
     return {
@@ -19,7 +23,7 @@ export async function generateMetadata({
     };
   }
 
-  const restaurant = MOCK_RESTAURANTS[mapping.restaurantId];
+  const restaurant = getRestaurant(mapping.restaurantId);
   if (!restaurant) {
     return {
       title: "Menu Not Found | PlateProject",
@@ -35,47 +39,25 @@ export async function generateMetadata({
 
 export default async function MenuPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ hashCode: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
   const hashCode = resolvedParams.hashCode;
-  const mapping = HASH_MAPPINGS[hashCode];
+  const tableCode = typeof resolvedSearchParams?.table === "string" ? resolvedSearchParams.table : "";
+  const mapping = getQRMapping(hashCode, tableCode);
 
   if (!mapping) {
-    return (
-      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center min-h-screen bg-white">
-        <span className="text-4xl mb-4">⚠️</span>
-        <h2 className="text-lg font-black text-stone-900 mb-2">
-          Invalid QR code or Restaurant not found.
-        </h2>
-        <Link
-          href="/"
-          className="px-6 py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-full transition-all mt-4 uppercase tracking-wider shadow-sm"
-        >
-          Go back to Home
-        </Link>
-      </div>
-    );
+    return <InvalidQRFallback message="Invalid QR code or Restaurant/Table not found" />;
   }
 
-  const restaurant = MOCK_RESTAURANTS[mapping.restaurantId];
+  const restaurant = getRestaurant(mapping.restaurantId);
 
   if (!restaurant) {
-    return (
-      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center min-h-screen bg-white">
-        <span className="text-4xl mb-4">⚠️</span>
-        <h2 className="text-lg font-black text-stone-900 mb-2">
-          Invalid QR code or Restaurant not found.
-        </h2>
-        <Link
-          href="/"
-          className="px-6 py-2.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-black rounded-full transition-all mt-4 uppercase tracking-wider shadow-sm"
-        >
-          Go back to Home
-        </Link>
-      </div>
-    );
+    return <InvalidQRFallback message="Invalid QR code or Restaurant not found" />;
   }
 
   const data = {
@@ -90,3 +72,4 @@ export default async function MenuPage({
 
   return <MenuFeed data={data} />;
 }
+

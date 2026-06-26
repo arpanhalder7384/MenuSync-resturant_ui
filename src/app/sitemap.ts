@@ -1,5 +1,5 @@
 import { MetadataRoute } from "next";
-import { HASH_MAPPINGS } from "@/lib/mockData";
+import { getAllMappings } from "@/lib/dataService";
  
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://menusync.in";
@@ -14,9 +14,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
  
-  // Add restaurant specific table routes dynamically from HASH_MAPPINGS
-  const menuRoutes = Object.keys(HASH_MAPPINGS).map((hash) => ({
-    url: `${baseUrl}/menu/${hash}`,
+  // Add restaurant specific table routes dynamically from dataService mappings
+  const menuRoutes: MetadataRoute.Sitemap = getAllMappings().map(({ restaurantCode, tableCode }) => ({
+    url: `${baseUrl}/menu/${restaurantCode}?table=${tableCode}`,
     lastModified: new Date(),
     changeFrequency: "daily" as const,
     priority: 0.8,

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "@/lib/cart";
 import { useTranslation } from "@/lib/translations";
 
@@ -18,12 +18,15 @@ export default function CartDrawer({
   const { language, t } = useTranslation();
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const hashCode = typeof params?.hashCode === "string" ? params.hashCode : "";
+  const tableCode = searchParams.get("table") || "";
 
   if (!isOpen || cart.length === 0) return null;
 
   const handlePlaceOrder = () => {
-    router.push(`/menu/${hashCode}/confirm`);
+    const tableQuery = tableCode ? `?table=${tableCode}` : "";
+    router.push(`/menu/${hashCode}/confirm${tableQuery}`);
   };
 
   return (

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { HASH_MAPPINGS, MOCK_RESTAURANTS } from "@/lib/mockData";
+import { getQRMapping, getRestaurant } from "@/lib/dataService";
 
 export async function GET(
   request: NextRequest,
@@ -8,7 +8,8 @@ export async function GET(
   try {
     const resolvedParams = await params;
     const hashCode = resolvedParams.hashCode;
-    const mapping = HASH_MAPPINGS[hashCode];
+    const tableCode = request.nextUrl.searchParams.get("table") || "";
+    const mapping = getQRMapping(hashCode, tableCode);
 
     if (!mapping) {
       return NextResponse.json(
@@ -17,7 +18,7 @@ export async function GET(
       );
     }
 
-    const restaurant = MOCK_RESTAURANTS[mapping.restaurantId];
+    const restaurant = getRestaurant(mapping.restaurantId);
 
     if (!restaurant) {
       return NextResponse.json(

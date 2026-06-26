@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { useTranslation } from "@/lib/translations";
+import { generateRestaurantCode, generateTableCode } from "@/utils/crypto";
 
 export default function SimulatedTables() {
   const { language, t } = useTranslation();
@@ -29,7 +30,7 @@ export default function SimulatedTables() {
         
         {/* Cafe Adda Table 01 */}
         <Link
-          href="/menu/mdbhjsadjasdgjafcvcsj3213h2veg24gh234h"
+          href={`/menu/${generateRestaurantCode("+917074266873")}?table=${generateTableCode("+917074266873", "01")}`}
           className="relative flex flex-col justify-between p-6 bg-gradient-to-br from-white to-stone-50/10 border border-stone-200/60 border-t-4 border-t-orange-500 rounded-3xl shadow-[0_4px_25px_rgba(0,0,0,0.015)] hover:shadow-[0_15px_35px_rgba(234,88,12,0.1)] hover:border-orange-500/30 transition-all transform hover:-translate-y-1.5 group overflow-hidden"
         >
           {/* Decorative Top-Right Brass Table Badge */}
@@ -67,7 +68,7 @@ export default function SimulatedTables() {
 
         {/* Cafe Harbour Table 03 */}
         <Link
-          href="/menu/cafeharbour9012"
+          href={`/menu/${generateRestaurantCode("+916294267705")}?table=${generateTableCode("+916294267705", "03")}`}
           className="relative flex flex-col justify-between p-6 bg-gradient-to-br from-white to-stone-50/10 border border-stone-200/60 border-t-4 border-t-amber-500 rounded-3xl shadow-[0_4px_25px_rgba(0,0,0,0.015)] hover:shadow-[0_15px_35px_rgba(245,158,11,0.1)] hover:border-amber-500/30 transition-all transform hover:-translate-y-1.5 group overflow-hidden"
         >
           {/* Decorative Top-Right Brass Table Badge */}
@@ -105,7 +106,7 @@ export default function SimulatedTables() {
 
         {/* Spice Garden Table 04 */}
         <Link
-          href="/menu/spicegarden1234"
+          href={`/menu/${generateRestaurantCode("+917384190892")}?table=${generateTableCode("+917384190892", "04")}`}
           className="relative flex flex-col justify-between p-6 bg-gradient-to-br from-white to-stone-50/10 border border-stone-200/60 border-t-4 border-t-amber-500 rounded-3xl shadow-[0_4px_25px_rgba(0,0,0,0.015)] hover:shadow-[0_15px_35px_rgba(245,158,11,0.1)] hover:border-amber-500/30 transition-all transform hover:-translate-y-1.5 group overflow-hidden"
         >
           {/* Decorative Top-Right Brass Table Badge */}

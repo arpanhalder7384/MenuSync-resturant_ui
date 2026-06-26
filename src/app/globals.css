@@ -62,3 +62,16 @@ body {
 .animate-slot-roll {
   animation: slotRoll 0.1s linear infinite;
 }
+
+@keyframes scan {
+  0% {
+    top: 5%;
+  }
+  50% {
+    top: 95%;
+  }
+  100% {
+    top: 5%;
+  }
+}
+
